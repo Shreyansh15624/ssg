@@ -4,7 +4,7 @@ from textnode import TextNode, TextType
 
 def text_node_to_html_node(text_node):
     match text_node.text_type:
-        case TextType.PLAIN:
+        case TextType.TEXT:
             return LeafNode(None, text_node.text)
         case TextType.BOLD:
             return LeafNode("b", text_node.text)
@@ -22,7 +22,7 @@ def text_node_to_html_node(text_node):
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     final_list = []
     for node in old_nodes:
-        if node.text_type != TextType.PLAIN:
+        if node.text_type != TextType.TEXT:
             final_list.append(node)
             continue
         split_values = node.text.split(delimiter)
@@ -35,7 +35,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                 res1 = TextNode(split_values[i], text_type)
                 final_list.append(res1)
             else:
-                res2 = TextNode(split_values[i], TextType.PLAIN)
+                res2 = TextNode(split_values[i], TextType.TEXT)
                 final_list.append(res2)
     return final_list
 
