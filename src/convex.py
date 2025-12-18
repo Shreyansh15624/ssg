@@ -43,6 +43,51 @@ def extract_markdown_images(text):
     res = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
     return res
 
-def extract_markdown_links(text):
-    res = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+def extract_markdown_links(text): #(?<!!)
+    res = re.findall(r"\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
     return res
+
+def split_nodes_image(old_nodes):
+    final_list = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            final_list.append(node)
+            continue
+        if len(node.text) != 0:
+            res1 = extract_markdown_images(node.text)
+            if len(res1) != 0:
+                text = node.text
+                for anchor_txt, url in res1:
+                    markdown = f"![{anchor_txt}]({url})"
+                    before, after = text.split(markdown, 1)
+                    if before != "":
+                        final_list.append(TextNode(before, TextType.TEXT))
+                    final_list.append(TextNode(anchor_txt, TextType.IMAGE, url))
+                    text = after
+                if text != "":
+                    final_list.append(TextNode(text, TextType.TEXT))
+    # print(final_list)
+    return final_list
+
+def split_nodes_link(old_nodes):
+    final_list = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            final_list.append(node)
+            continue
+        if len(node.text) != 0:
+            res2 = extract_markdown_links(node.text)
+            if len(res2) != 0:
+                text = node.text
+                for alt_txt, url in res2:
+                    markdown = f"[{alt_txt}]({url})"
+                    before, after = text.split(markdown, 1)
+                    if before != "":
+                        final_list.append(TextNode(before, TextType.TEXT))
+                    final_list.append(TextNode(alt_txt, TextType.LINK, url))
+                    text = after
+                if text != "":
+                    final_list.append(TextNode(text, TextType.TEXT))
+    # print(final_list)
+    return final_list
+
