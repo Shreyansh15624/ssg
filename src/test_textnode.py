@@ -2,7 +2,7 @@ import unittest
 
 from textnode import TextNode, TextType
 from convex import text_node_to_html_node, split_nodes_delimiter, extract_markdown_images, extract_markdown_links
-from convex import split_nodes_image, split_nodes_link
+from convex import split_nodes_image, split_nodes_link, text_to_textnodes
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -56,6 +56,7 @@ class TestTextNode(unittest.TestCase):
             {"src": "https://www.boot.dev/image.png", "alt": "This is an image"},
         )
     
+class TestInlineMarkdown(unittest.TestCase):
     def test_delim_bold(self):
         node = TextNode("This is text with a **bolded** word", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
@@ -107,6 +108,116 @@ class TestTextNode(unittest.TestCase):
         )
         self.assertListEqual([("link", "https://www.example.com")], matches)
     
+    def test_split_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_split_image_single(self):
+        node = TextNode(
+            "![image](https://www.example.com/image.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(
+            [
+                TextNode("image", TextType.IMAGE, "https://www.example.com/image.png"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_images_consecutive(self):
+        # This tests if your loop correctly handles images right next to each other
+        node = TextNode(
+            "![first](first.png)![second](second.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertEqual(
+            [
+                TextNode("first", TextType.IMAGE, "first.png"),
+                TextNode("second", TextType.IMAGE, "second.png"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            [
+                TextNode("This is text with a link ", TextType.TEXT),
+                TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode(
+                    "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links_start_end(self):
+        # Tests matches at the very start and very end of the string
+        node = TextNode(
+            "[start](start.com) middle [end](end.com)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            [
+                TextNode("start", TextType.LINK, "start.com"),
+                TextNode(" middle ", TextType.TEXT),
+                TextNode("end", TextType.LINK, "end.com"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_links_no_links(self):
+        # Ensures that text without links is returned unchanged
+        node = TextNode(
+            "This is text with no links",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            [
+                TextNode("This is text with no links", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+
+    def test_split_other_types(self):
+        # Ensures that non-TEXT types (like BOLD) are skipped/preserved
+        node = TextNode("This is bold", TextType.BOLD)
+        new_nodes = split_nodes_link([node])
+        self.assertEqual(
+            [
+                TextNode("This is bold", TextType.BOLD),
+            ],
+            new_nodes,
+        )
+    
+    
+    
+    
+    
+    
     def test_split_images(self):
         node = TextNode(
             "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
@@ -141,6 +252,25 @@ class TestTextNode(unittest.TestCase):
                 ),
             ],
             new_nodes,
+        )
+        
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        output = text_to_textnodes(text)
+        self.assertEqual(
+            output,
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ]
         )
 
 if __name__ == "__main__":

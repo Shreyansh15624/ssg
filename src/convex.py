@@ -55,6 +55,9 @@ def split_nodes_image(old_nodes):
             continue
         if len(node.text) != 0:
             res1 = extract_markdown_images(node.text)
+            if len(res1) == 0:
+                final_list.append(node)
+                continue
             if len(res1) != 0:
                 text = node.text
                 for anchor_txt, url in res1:
@@ -77,6 +80,9 @@ def split_nodes_link(old_nodes):
             continue
         if len(node.text) != 0:
             res2 = extract_markdown_links(node.text)
+            if len(res2) == 0:
+                final_list.append(node)
+                continue
             if len(res2) != 0:
                 text = node.text
                 for alt_txt, url in res2:
@@ -91,3 +97,11 @@ def split_nodes_link(old_nodes):
     # print(final_list)
     return final_list
 
+def text_to_textnodes(text):
+    text_list = [TextNode(text, TextType.TEXT)]
+    text_list = (split_nodes_delimiter(text_list, "**", TextType.BOLD)) # bold split
+    text_list = (split_nodes_delimiter(text_list, "_", TextType.ITALIC)) # itaics split
+    text_list = (split_nodes_delimiter(text_list, "`", TextType.CODE)) # code split
+    text_list = (split_nodes_image(text_list))
+    text_list = (split_nodes_link(text_list))
+    return text_list
