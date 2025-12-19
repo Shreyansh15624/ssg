@@ -1,6 +1,6 @@
 import re
 from htmlnode import LeafNode
-from textnode import TextNode, TextType
+from textnode import TextNode, TextType, BlockType
 
 def text_node_to_html_node(text_node):
     match text_node.text_type:
@@ -116,3 +116,49 @@ def markdown_to_blocks(text):
         block = block.strip()
         cleaned_blocks.append(block)
     return cleaned_blocks
+
+def block_to_block_type(block):
+    # Case 1: BlockType.HEADING
+    if block.startswith("#"):
+        hash_count = 0
+        i = 0
+        while i < len(block) and block[i] == "#":
+            hash_count += 1
+            i += 1
+        if i < len(block) and block[i] == " " and hash_count in range(1, 7):
+            return BlockType.HEADING
+    # Case 2: BlockType.CODE
+    if block[:3] == "```" and block[-3:] == "```":
+        return BlockType.CODE
+    # Case 3: BlockType.QUOTE
+    if block.startswith(">"):
+        split_blocks = block.split("\n")
+        fact = True
+        for block_part in split_blocks: 
+            if not block_part.startswith(">"):
+                fact = False
+                break
+        if fact:
+            return BlockType.QUOTE
+    # Case 4: BlockType.UNORDERED_LIST
+    if block.startswith("- "):
+        split_blocks = block.split("\n")
+        fact = True
+        for block_part in split_blocks:
+            if not block_part.startswith("- "):
+                fact = False
+                break
+        if fact:
+            return BlockType.UNORDERED_LIST
+    # Case 5: BlockType.ORDERED_LIST
+    if block.startswith("1. "):
+        split_blocks = block.split("\n")
+        fact = True
+        for i in range(len(split_blocks)):
+            if not split_blocks[i].startswith(f"{i+1}. "):
+                fact = False
+                break
+        if fact == True:
+            return BlockType.ORDERED_LIST
+    # Default Case: BlockType.PARAGRAPH
+    return BlockType.PARAGRAPH
