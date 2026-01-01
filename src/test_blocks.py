@@ -1,5 +1,6 @@
 from textnode import BlockType
-from convex import block_to_block_type
+from htmlnode import HTMLNode
+from convex import block_to_block_type, markdown_to_html_node
 import unittest
 
 class TestBlockToBlockType(unittest.TestCase):
@@ -41,6 +42,57 @@ class TestBlockToBlockType(unittest.TestCase):
     def test_block_paragraph(self):
         self.assertEqual(block_to_block_type("Just a normal paragraph."), BlockType.PARAGRAPH)
         self.assertEqual(block_to_block_type(""), BlockType.PARAGRAPH)
+
+class TestMarkdownToHTML(unittest.TestCase):
+    def test_paragraph(self):
+        md = """
+This is a paragraph
+with two lines.
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is a paragraph with two lines.</p></div>",
+        )
+
+    def test_lists(self):
+        md = """
+- Item 1
+- Item 2
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ul><li>Item 1</li><li>Item 2</li></ul></div>",
+        )
+
+    def test_headings(self):
+        # FIX: Added a double newline between headers so they are seen as separate blocks
+        md = """
+# Header 1
+
+### Header 3
+"""
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><h1>Header 1</h1><h3>Header 3</h3></div>",
+        )
+
+    def test_code_block(self):
+        # FIX: Used explicit newline characters to avoid indentation issues
+        md = "```\nprint(\"Hello\")\n```"
+        
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>print(\"Hello\")</code></pre></div>",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

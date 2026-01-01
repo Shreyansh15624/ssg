@@ -6,7 +6,7 @@ class BlockType(Enum):
     CODE = "code"
     QUOTE = "quote"
     UNORDERED_LIST = "unordered_list"
-    ORDERED_LIST = "ordered_lsit"
+    ORDERED_LIST = "ordered_list"
 
 class TextType(Enum):
     TEXT = "text"
