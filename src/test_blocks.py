@@ -69,7 +69,6 @@ with two lines.
         )
 
     def test_headings(self):
-        # FIX: Added a double newline between headers so they are seen as separate blocks
         md = """
 # Header 1
 
@@ -83,7 +82,6 @@ with two lines.
         )
 
     def test_code_block(self):
-        # FIX: Used explicit newline characters to avoid indentation issues
         md = "```\nprint(\"Hello\")\n```"
         
         node = markdown_to_html_node(md)
