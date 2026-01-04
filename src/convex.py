@@ -225,7 +225,7 @@ def olist_to_html_node(block):
         text = item[3:]
         children = text_to_children(text)
         html_items.append(ParentNode("li", children))
-    return ParentNode("ol", children)
+    return ParentNode("ol", html_items)
 
 def block_to_html_node(block):
     block_type = block_to_block_type(block)
@@ -250,3 +250,4 @@ def markdown_to_html_node(markdown):
         html_node = block_to_html_node(block)
         children.append(html_node)
     return ParentNode("div", children, None)
+
