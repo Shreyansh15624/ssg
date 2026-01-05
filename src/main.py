@@ -8,7 +8,7 @@ TEMPLATE_NAME = "template.html"
 
 def main():
     
-    base_path = sys.argv[1] if sys.argv[1] else "/"
+    base_path = sys.argv[1] if len(sys.argv) > 1 else "/"
     
     # Defining the Project's Main Directory
     main_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,7 +30,7 @@ def main():
     if os.path.exists(public_path):
         shutil.rmtree(public_path)
     
-    # Created a new docs_path for GitHub Sites Compatibility
+    # Created a new docs_path for GitHub Pages Compatibility
     docs_path = os.path.join(main_dir, "docs")
     if os.path.exists(docs_path):
         shutil.rmtree(docs_path)
