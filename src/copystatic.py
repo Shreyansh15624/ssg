@@ -1,8 +1,7 @@
 import os
 import shutil
 
-def copy_static_recursive_trigger(main_dir, directories):
-    public_path = os.path.join(main_dir, "public")
+def copy_static_recursive_trigger(main_dir, directories, public_path):
     if os.path.exists(public_path):
         shutil.rmtree(public_path)
     if "public" not in directories or not os.path.exists(public_path):

@@ -69,7 +69,7 @@ def split_nodes_image(old_nodes):
                     text = after
                 if text != "":
                     final_list.append(TextNode(text, TextType.TEXT))
-    # print(final_list)
+    # print(final_list) # for debugging
     return final_list
 
 def split_nodes_link(old_nodes):
@@ -94,7 +94,7 @@ def split_nodes_link(old_nodes):
                     text = after
                 if text != "":
                     final_list.append(TextNode(text, TextType.TEXT))
-    # print(final_list)
+    # print(final_list) # for debugging
     return final_list
 
 def text_to_textnodes(text):
