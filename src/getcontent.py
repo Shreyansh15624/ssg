@@ -36,8 +36,8 @@ def generate_page(from_path, template_path, dest_path, base_path):
     full_html_string = full_html_string.replace("{{ Content }}", html_string)
     
     # Replacing Links to be Deployable on GitHub Links
-    full_html_string = full_html_string.replace("href=/", f"href={base_path}")
-    full_html_string = full_html_string.replace("src=/", f"src={base_path}")
+    full_html_string = full_html_string.replace('href="/', f"href={base_path}")
+    full_html_string = full_html_string.replace('src="/', f"src={base_path}")
     
     # Deducing the filename
     from_filename = os.path.basename(from_path)
