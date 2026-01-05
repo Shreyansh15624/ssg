@@ -9,7 +9,7 @@ TEMPLATE_NAME = "template.html"
 def main():
     
     base_path = sys.argv[1] if len(sys.argv) > 1 else "/"
-    
+    print(base_path)
     # Defining the Project's Main Directory
     main_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     directories = os.listdir(main_dir) # Listing its Contents into a List
