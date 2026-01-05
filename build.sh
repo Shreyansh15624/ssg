@@ -1,2 +1,2 @@
-python3 src/main.py "/ssg/"
+python3 src/main.py "/ssg/docs/"
 cd docs && python3 -m http.server 8888
