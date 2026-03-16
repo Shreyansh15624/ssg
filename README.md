@@ -8,27 +8,42 @@ This tool was architected to demonstrate a deep understanding of parsing algorit
 
 ### 1. Lexical Analysis & Custom AST (Abstract Syntax Tree)
 
-Instead of relying on regex hacks or `BeautifulSoup`, the engine constructs a strict internal representation of the HTML DOM.
-
-- **Node Hierarchy:** Utilizes a polymorphic class structure (`HTMLNode`, `LeafNode`, `ParentNode`) to represent elements.
-- **Multi-Pass Parsing:** The parsing engine separates concerns by first dividing raw markdown into structural blocks (Headings, Code Blocks, Lists), and subsequently executing an inline-level tokenization pass for text formatting (Bold, Italic, Links).
+* **Node Hierarchy (`src/htmlnode.py`, `src/textnode.py`):** Utilizes a polymorphic class structure to represent elements natively in memory.
+* **Multi-Pass Parsing (`src/convex.py`):** The engine separates concerns by first dividing raw markdown into structural blocks, and subsequently executing an inline-level tokenization pass for text formatting.
 
 ### 2. Recursive Filesystem Traversal
 
-- Implements a Depth-First Search (DFS) algorithm to crawl the `content/` directory.
-- Distinguishes between sub-directories and target files, mirroring the exact source tree in the final build output while recursively propagating static assets (CSS, images) to the `public/` directory.
+* **Static Asset Pipeline (`src/copystatic.py`):** Implements a Depth-First Search (DFS) algorithm to crawl the `static/` directory and propagate CSS/images into the compiled build.
+* **Content Generation (`src/getcontent.py`):** Mirrors the exact source tree of the `content/` directory into the final build output in `docs/`, dynamically injecting generated HTML into `template.html`.
 
-### 3. Environment-Aware Path Resolution
+## 📂 Repository Structure
 
-- **Dynamic Routing:** Hardcoded relative links break in sub-directory deployments (like GitHub Pages). The engine accepts configurable base-path arguments via `sys.argv` at runtime, dynamically resolving and injecting environment-aware URIs into the final HTML compilation.
+The project is structured into distinct layers separating the source content, the compilation engine, and the deployment artifacts.
 
-## 🚀 Quick Start & Compilation
+```text
+├── content/            # Source Markdown files (mirrored in output)
+├── static/             # Raw CSS and image assets
+├── docs/               # Compiled HTML build artifacts (GitHub Pages target)
+├── src/                # Core Python compiler engine
+│   ├── main.py         # Entry point & execution arguments
+│   ├── htmlnode.py     # DOM tree data structures
+│   ├── convex.py       # Markdown parsing & tokenization logic
+│   └── copystatic.py   # Filesystem traversal & asset pipeline
+├── template.html       # Base HTML injection template
+└── *.sh                # Bash scripts for automated build & testing
+
+```
+
+## 🚀 Quick Start & Execution
 
 ### Prerequisites
 
-- Python 3.x (Zero external dependencies required)
+* Python 3.x (Zero external dependencies required)
+* Bash/Zsh environment
 
-### Execution
+### Execution via Shell Automation
+
+Instead of running raw Python commands, the project utilizes bash scripts to automate the build and test pipelines, ensuring a frictionless developer experience.
 
 1. **Clone the repository:**
 ```bash
@@ -38,18 +53,25 @@ cd ssg
 ```
 
 
-2. **Compile the Site (Localhost Environment):**
+2. **Execute the Build Pipeline:**
 ```bash
-# Executes the build step targeting the root path "/"
-python3 src/main.py
+# Cleans the docs/ directory and compiles a fresh build
+./build.sh
 
 ```
 
 
-3. **Serve the Build Artifacts:**
+3. **Run the Automated Test Suite:**
 ```bash
-cd docs
-python3 -m http.server 8888
+# Discovers and executes all unit tests in the src/ directory
+./test.sh
+
+```
+
+
+4. **Serve the Local Build:**
+```bash
+./main.sh
 
 ```
 
@@ -58,21 +80,4 @@ python3 -m http.server 8888
 
 ## 🌐 Production Deployment
 
-The compilation engine is optimized to generate artifacts ready for static hosting environments (e.g., GitHub Pages, AWS S3, Vercel).
-
-**Compile for Sub-Directory Hosting:**
-
-```bash
-# Injects the repository name as the base URL to prevent broken asset routing
-python3 src/main.py "/ssg/"
-
-```
-
-## 🧪 Testing
-
-The parsing engine is fully unit-tested using Python's standard `unittest` library to ensure block and inline tokenization edge cases are strictly handled.
-
-```bash
-python3 -m unittest discover -s src
-
-```
+The compilation engine is optimized to generate artifacts ready for static hosting environments. By outputting directly to the `docs/` folder, the project natively supports the **GitHub Pages** deployment workflow directly from the `main` branch.
