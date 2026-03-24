@@ -1,83 +1,62 @@
-# ⚡ Zero-Dependency Python SSG: Markdown-to-HTML Compiler
+# Statis Site Generator: Markdown-to-HTML Compiler
+
+## Description
 
 A lightweight, high-performance static site generator built entirely from scratch in standard Python. This engine bypasses bloated external libraries, featuring a custom lexer, a recursive file-system crawler, and an in-memory Document Object Model (DOM) to compile raw Markdown into a deployable static site.
 
-## 🏗️ System Architecture & Compiler Design
+The project is structured into distinct layers separating the source content, the compilation engine, and the deployment artifacts:
+* `content/`: Source Markdown files (mirrored in output)
+* `static/`: Raw CSS and image assets
+* `docs/`: Compiled HTML build artifacts
+* `src/`: Core Python compiler engine (AST generation, multi-pass parsing, and DFS filesystem traversal)
 
-This tool was architected to demonstrate a deep understanding of parsing algorithms, data structures, and zero-dependency environment execution.
+## Motivation
 
-### 1. Lexical Analysis & Custom AST (Abstract Syntax Tree)
+This tool was architected to demonstrate a deep understanding of parsing algorithms, data structures, and zero-dependency environment execution. By building the lexer, AST, and recursive filesystem crawler entirely from scratch, it serves as a comprehensive showcase of clean backend architecture and core Python capabilities.
 
-* **Node Hierarchy (`src/htmlnode.py`, `src/textnode.py`):** Utilizes a polymorphic class structure to represent elements natively in memory.
-* **Multi-Pass Parsing (`src/convex.py`):** The engine separates concerns by first dividing raw markdown into structural blocks, and subsequently executing an inline-level tokenization pass for text formatting.
+## Quick Start
 
-### 2. Recursive Filesystem Traversal
+The project utilizes bash scripts to automate the build and test pipelines, ensuring a frictionless setup.
 
-* **Static Asset Pipeline (`src/copystatic.py`):** Implements a Depth-First Search (DFS) algorithm to crawl the `static/` directory and propagate CSS/images into the compiled build.
-* **Content Generation (`src/getcontent.py`):** Mirrors the exact source tree of the `content/` directory into the final build output in `docs/`, dynamically injecting generated HTML into `template.html`.
-
-## 📂 Repository Structure
-
-The project is structured into distinct layers separating the source content, the compilation engine, and the deployment artifacts.
-
-```text
-├── content/            # Source Markdown files (mirrored in output)
-├── static/             # Raw CSS and image assets
-├── docs/               # Compiled HTML build artifacts (GitHub Pages target)
-├── src/                # Core Python compiler engine
-│   ├── main.py         # Entry point & execution arguments
-│   ├── htmlnode.py     # DOM tree data structures
-│   ├── convex.py       # Markdown parsing & tokenization logic
-│   └── copystatic.py   # Filesystem traversal & asset pipeline
-├── template.html       # Base HTML injection template
-└── *.sh                # Bash scripts for automated build & testing
-
-```
-
-## 🚀 Quick Start & Execution
-
-### Prerequisites
-
-* Python 3.x (Zero external dependencies required)
-* Bash/Zsh environment
-
-### Execution via Shell Automation
-
-Instead of running raw Python commands, the project utilizes bash scripts to automate the build and test pipelines, ensuring a frictionless developer experience.
-
-1. **Clone the repository:**
+**1. Clone the repository:**
 ```bash
 git clone https://github.com/shreyansh15624/ssg.git
 cd ssg
-
 ```
 
-
-2. **Execute the Build Pipeline:**
+**2. Execute the Build Pipeline:**
 ```bash
-# Cleans the docs/ directory and compiles a fresh build
 ./build.sh
-
 ```
 
-
-3. **Run the Automated Test Suite:**
+**3. Run the Automated Test Suite:**
 ```bash
-# Discovers and executes all unit tests in the src/ directory
 ./test.sh
-
 ```
 
-
-4. **Serve the Local Build:**
+**4. Serve the Local Build:**
 ```bash
 ./main.sh
-
 ```
+*Navigate to `http://localhost:8888`*
 
+## Usage
 
-*Navigate to `http://localhost:8888*`
+To use this compiler for your own static site:
+1. Place your raw Markdown files into the `content/` directory.
+2. Place any required CSS, images, or static assets into the `static/` directory.
+3. Modify `template.html` to adjust the base HTML injection template.
+4. Run `./build.sh` to compile the site. 
 
-## 🌐 Production Deployment
+The compilation engine will output directly to the `docs/` folder, generating artifacts ready for static hosting environments. The project natively supports the **GitHub Pages** deployment workflow directly from the `main` branch.
 
-The compilation engine is optimized to generate artifacts ready for static hosting environments. By outputting directly to the `docs/` folder, the project natively supports the **GitHub Pages** deployment workflow directly from the `main` branch.
+## Contributing
+
+Contributions are welcome! If you'd like to improve the compiler or add new features:
+1. Fork the repository.
+2. Create a new branch for your feature (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
+
+Please ensure all new features pass the existing test suite by running `./test.sh` before submitting a PR.
